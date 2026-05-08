@@ -280,22 +280,9 @@ def main():
     app.add_handler(CallbackQueryHandler(subgame_callback, pattern="^subgame_"))
     app.add_handler(CallbackQueryHandler(contacts_callback, pattern="^contacts$"))
 
-    # Для деплоя на Railway используем webhook
-    PORT = int(os.environ.get("PORT", 8000))
-    WEBHOOK_URL = os.environ.get("RAILWAY_PUBLIC_DOMAIN")
-    
-    if WEBHOOK_URL:
-        # Продакшн: запуск через webhook
-        app.run_webhook(
-            listen="0.0.0.0",
-            port=PORT,
-            webhook_url=f"https://{WEBHOOK_URL}/webhook"
-        )
-        print(f"Бот запущен через webhook на порту {PORT}...")
-    else:
-        # Локально: запуск через polling
-        print("Бот запущен локально...")
-        app.run_polling()
+    # Для Railway используем polling (проще и надёжнее на бесплатном тарифе)
+    print("Бот запущен...")
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
