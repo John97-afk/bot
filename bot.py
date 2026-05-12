@@ -5,8 +5,7 @@ from telegram.constants import ParseMode
 from telegram import InputMediaPhoto, InputMediaVideo
 
 # ═══════════════════ НАСТРОЙКИ ═══════════════════
-BOT_TOKEN = "8732820371:AAE4iCT-TFMvF5sU10twYX4CT-Nx9yzifUA"
-
+BOT_TOKEN = "СЮДА_ВСТАВЬ_ТОКЕН_ОТ_BOTFATHER"  # замени на свой
 WELCOME_IMAGE_PATH = "media/welcome.jpg"
 
 # ═══════════════════ ДАННЫЕ УСЛУГ И ИГР ═══════════════════
@@ -16,10 +15,10 @@ MAIN_SECTIONS = {
         "title": "Танцы",
         "description": (
             "💃 <b>Танцевальные шоу</b>\n\n"
-            "• Научим танцевать даже твою тёщу\n"
-            "• Мы учились для этого в шараге\n"
-            "• Профессиональный стриптиз + приват\n\n"
-            "Оплата только наличкой!"
+            "• Постановка свадебного танца\n"
+            "• Шоу-балет\n"
+            "• Мастер-классы\n\n"
+            "Описание заменишь под себя."
         ),
         "media_folder": "media/dance"
     },
@@ -28,9 +27,9 @@ MAIN_SECTIONS = {
         "description": (
             "🎤 <b>Кавер-группы</b>\n\n"
             "• Живой звук на мероприятие\n"
-            "• Бас ебашет, бабка пляшет\n"
-            "• Слезливые песни про твою бывшую\n\n"
-            "Обязательно наличие водки на площадке для выступающих."
+            "• Широкий репертуар\n"
+            "• Профессиональные музыканты\n\n"
+            "Описание заменишь под себя."
         ),
         "media_folder": "media/covers"
     },
@@ -38,12 +37,22 @@ MAIN_SECTIONS = {
         "title": "Организация мероприятий",
         "description": (
             "🎉 <b>Организация мероприятий</b>\n\n"
-            "• Похороны и поминки\n"
-            "• Допросы и пытки\n"
+            "• Свадьбы и юбилеи\n"
+            "• Корпоративы и тимбилдинги\n"
             "• Подбор площадки\n\n"
-            "Быстро и без крови."
+            "Описание заменишь под себя."
         ),
         "media_folder": "media/events"
+    },
+    "about": {
+        "title": "О нас",
+        "description": (
+            "ℹ️ <b>О нас</b>\n\n"
+            "Мы команда профессионалов, которая делает праздники незабываемыми.\n"
+            "Работаем с 2015 года.\n\n"
+            "Описание заменишь под себя."
+        ),
+        "media_folder": "media/about"
     }
 }
 
@@ -80,11 +89,13 @@ GAMES_SUB = {
 CONTACTS_TEXT = (
     "📞 <b>Контакты организаторов</b>\n\n"
     "<b>Телефоны:</b>\n"
-    "+7 (985) 147-42-36\n"
-    "+7 (968) 365-38-03\n"
+    "+7 (XXX) XXX-XX-XX\n"
+    "+7 (XXX) XXX-XX-XX\n"
+    "+7 (XXX) XXX-XX-XX\n\n"
     "<b>Telegram:</b>\n"
-    "@glazkov_work\n"
-    "@anutanuuuta\n"
+    "@username1\n"
+    "@username2\n"
+    "@username3"
 )
 
 # ═══════════════════ КЛАВИАТУРЫ ═══════════════════
@@ -100,6 +111,7 @@ def build_main_menu_keyboard():
         [InlineKeyboardButton("💃 Танцы", callback_data="section_dance")],
         [InlineKeyboardButton("🎤 Кавер-группы", callback_data="section_covers")],
         [InlineKeyboardButton("🎉 Организация мероприятий", callback_data="section_events")],
+        [InlineKeyboardButton("ℹ️ О нас", callback_data="section_about")],
         [InlineKeyboardButton("📞 Показать контакты", callback_data="contacts")]
     ])
 
@@ -113,8 +125,16 @@ def build_games_submenu_keyboard():
     ])
 
 def build_section_keyboard():
+    """Для обычных услуг (включая 'О нас'): возврат в главное меню."""
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("🔙 Вернуться к услугам", callback_data="main_menu")],
+        [InlineKeyboardButton("📞 Показать контакты", callback_data="contacts")]
+    ])
+
+def build_subgame_keyboard():
+    """Для подразделов игр: возврат к списку игр, а не в главное меню."""
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Вернуться к играм", callback_data="menu_games")],
         [InlineKeyboardButton("📞 Показать контакты", callback_data="contacts")]
     ])
 
@@ -127,8 +147,8 @@ def build_contacts_keyboard():
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     caption = (
-        "👋 <b>Здравствуйте! Вас приветствует Holiday Event Group!</b>\n\n"
-        "Мы организуем общественные и корпоративные мероприятия любого масштаба под ваш бюджет, скорее знакомьтесь с нашим каталогом!"
+        "👋 <b>Добро пожаловать в наше портфолио!</b>\n\n"
+        "Здесь вы можете познакомиться с нашими услугами и выбрать то, что нужно именно вам."
     )
     if os.path.isfile(WELCOME_IMAGE_PATH):
         with open(WELCOME_IMAGE_PATH, "rb") as photo:
@@ -148,16 +168,25 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def main_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    # Отправляем новое сообщение вместо редактирования старого с фото
+    # Удаляем предыдущее сообщение с кнопками
+    try:
+        await query.message.delete()
+    except:
+        pass
     await query.message.reply_text(
         text="<b>Выберите услугу:</b>",
         reply_markup=build_main_menu_keyboard(),
         parse_mode=ParseMode.HTML
     )
+
 async def games_submenu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text(
+    try:
+        await query.message.delete()
+    except:
+        pass
+    await query.message.reply_text(
         text="<b>Гигантские игры — выберите игру:</b>",
         reply_markup=build_games_submenu_keyboard(),
         parse_mode=ParseMode.HTML
@@ -174,17 +203,21 @@ async def section_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("Раздел не найден.", reply_markup=build_main_menu_keyboard())
         return
 
-    # Сначала медиа БЕЗ подписи
+    # Удаляем предыдущее сообщение с кнопками
+    try:
+        await query.message.delete()
+    except:
+        pass
+
+    # Отправляем медиа из папки услуги (без подписи)
     await send_media_group(update, context, section["media_folder"])
 
-    # Потом описание с кнопками
+    # Отправляем описание с кнопками (возврат в главное меню)
     await query.message.reply_text(
         text=section["description"],
         reply_markup=build_section_keyboard(),
         parse_mode=ParseMode.HTML
     )
-
-    await send_media_group(update, context, section["media_folder"], description=section["description"])
 
 async def subgame_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -197,22 +230,30 @@ async def subgame_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("Игра не найдена.", reply_markup=build_games_submenu_keyboard())
         return
 
-    # Сначала медиа БЕЗ подписи
+    # Удаляем предыдущее сообщение с кнопками
+    try:
+        await query.message.delete()
+    except:
+        pass
+
+    # Отправляем медиа
     await send_media_group(update, context, subgame["media_folder"])
 
-    # Потом описание с кнопками
+    # Описание с кнопками (возврат к списку игр, а не в главное меню)
     await query.message.reply_text(
         text=subgame["description"],
-        reply_markup=build_section_keyboard(),
+        reply_markup=build_subgame_keyboard(),
         parse_mode=ParseMode.HTML
     )
-
-    await send_media_group(update, context, subgame["media_folder"], description=subgame["description"])
 
 async def contacts_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text(
+    try:
+        await query.message.delete()
+    except:
+        pass
+    await query.message.reply_text(
         text=CONTACTS_TEXT,
         reply_markup=build_contacts_keyboard(),
         parse_mode=ParseMode.HTML
@@ -221,7 +262,7 @@ async def contacts_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ═══════════════════ ОТПРАВКА МЕДИА ═══════════════════
 
 async def send_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE, folder: str):
-    """Отправляет все медиа из папки одной группой, без подписей."""
+    """Отправляет все фото и видео из папки одной группой, без подписей."""
     if not os.path.isdir(folder):
         return
 
@@ -278,7 +319,6 @@ def main():
     app.add_handler(CallbackQueryHandler(subgame_callback, pattern="^subgame_"))
     app.add_handler(CallbackQueryHandler(contacts_callback, pattern="^contacts$"))
 
-    # Для Railway используем polling (проще и надёжнее на бесплатном тарифе)
     print("Бот запущен...")
     app.run_polling()
 
