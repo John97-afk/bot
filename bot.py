@@ -5,7 +5,7 @@ from telegram.constants import ParseMode
 from telegram import InputMediaPhoto, InputMediaVideo
 
 # ═══════════════════ НАСТРОЙКИ ═══════════════════
-BOT_TOKEN = "СЮДА_ВСТАВЬ_ТОКЕН_ОТ_BOTFATHER"  # замени на свой
+BOT_TOKEN = "8732820371:AAE4iCT-TFMvF5sU10twYX4CT-Nx9yzifUA"  # замени на свой
 WELCOME_IMAGE_PATH = "media/welcome.jpg"
 
 # ═══════════════════ ДАННЫЕ УСЛУГ И ИГР ═══════════════════
