@@ -82,11 +82,9 @@ CONTACTS_TEXT = (
     "<b>Телефоны:</b>\n"
     "+7 (985) 147-42-36\n"
     "+7 (968) 365-38-03\n"
-    "+7 (XXX) XXX-XX-XX\n\n"
     "<b>Telegram:</b>\n"
     "@glazkov_work\n"
     "@anutanuuuta\n"
-    "@lolita_ter"
 )
 
 # ═══════════════════ КЛАВИАТУРЫ ═══════════════════
