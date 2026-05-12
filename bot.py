@@ -127,8 +127,8 @@ def build_contacts_keyboard():
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     caption = (
-        "👋 <b>Солнце светит а негры еще не пашут? Не беда!!</b>\n\n"
-        "С креативным подрядчиком Кейтеринг ИП А.Э. Даже самые ленивые негры начнут ебащить как не в себя!."
+        "👋 <b>Здравствуйте! Вас приветствует Holiday Event Group!</b>\n\n"
+        "Мы организуем общественные и корпоративные мероприятия любого масштаба под ваш бюджет, скорее знакомьтесь с нашим каталогом!"
     )
     if os.path.isfile(WELCOME_IMAGE_PATH):
         with open(WELCOME_IMAGE_PATH, "rb") as photo:
