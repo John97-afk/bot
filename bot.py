@@ -290,10 +290,15 @@ async def send_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE, f
         try:
             f = open(filepath, 'rb')
             file_handles.append(f)
-            if ext in ('.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp'):
-                media_group.append(InputMediaPhoto(media=f))
+            if ext in ('.mp4', '.mov', '.avi', '.mkv'):
+                # Для видео указываем размеры, чтобы сохранить пропорции
+                media_group.append(InputMediaVideo(
+                    media=f,
+                    width=1080,   # ширина вертикального видео
+                    height=1920   # высота вертикального видео (16:9)
+                ))
             else:
-                media_group.append(InputMediaVideo(media=f))
+                media_group.append(InputMediaPhoto(media=f))
         except Exception as e:
             print(f"Не удалось открыть {filename}: {e}")
 
@@ -308,7 +313,7 @@ async def send_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE, f
         finally:
             for f in file_handles:
                 f.close()
-
+                
 # ═══════════════════ ЗАПУСК БОТА ═══════════════════
 
 def main():
